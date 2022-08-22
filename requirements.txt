@@ -1,0 +1,4 @@
+flask
+geocoder
+tweepy
+gunicorn

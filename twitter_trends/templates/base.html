@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+    <title>Twitter Trends</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{url_for('static',filename='css/main.css')}}">
+</head>
+<style>
+    .location-container{
+        margin-top: 5%;
+    }
+
+    #pop-up{
+        padding: none !important;
+    }
+
+    #head{
+        width: fit-content;
+        background: black;
+        color: white;
+        padding: 5px 5px;
+        padding-left: 10px;
+        padding-right: 10px;
+        border: 1px solid black;
+        border-radius: 6px;
+    }
+
+    #head a{
+        color:white;
+    }
+    #navigator{
+        background: rgb(240, 239, 243);
+        width: fit-content;
+        padding: 10px;
+
+    }
+
+    
+</style>
+<body>
+    <br>
+    <center><h1>Twitter Trends</h1></center>
+    <br>
+    <div class="container">
+        <center>
+            <h4 id="location" style="color: white;">
+                <i class="fa-solid fa-house" style="margin-right: 10px;"></i><a href="{{url_for('index')}}">Home</a>
+                {%if country!=False and city!=False %}
+                    / <a href="{{url_for('country_specific',location=country)}}">{{country}}</a>
+                {%elif country!=False and city==False%}
+                   / <a href="{{url_for('country_specific',location=country)}}" style="color: white;text-decoration:none;pointer-events: none;">{{country}}</a>
+                {%endif%}
+                {%if city!=False %}
+                    / <a href="{{url_for('city_specific',country=country,city=city)}}" style="color: white;text-decoration:none;pointer-events: none;">{{city}}</a>
+                {%endif%}
+            </h4>
+        </center>
+    </div>
+    <section class="container wrapper">
+    
+        <div class="container search-list">
+            <div class="row" id="row_con"></div> 
+                {%block content%}
+                    
+                {%endblock%}
+                <div id="pop-up">
+                    <h3 id="pop-up-header"></h3>
+                    <table class="table table-bordered table-light">
+                        <tbody>
+                        <tr>
+                            <th scope="row">Rank</th>
+                            <td id="pop-up-rank"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Hashtag</th>
+                            <td id="pop-up-hashtag"></td> 
+                        </tr>
+                        <tr>
+                            <th scope="row">Volume</th>
+                            <td id="pop-up-volume"></td>
+                        </tr>
+                        </tbody>
+                      </table>
+                    <button type="button" id="close" class="btn btn-dark" onclick="toggle()">Close</button>
+            
+                </div>
+            
+        </div> 
+        <br>
+        <center><h3>Select Countries</h3></center>
+        <hr>
+        <div class="container location-container">
+            <div class="row">
+                {% for i in location_list %}
+                    <div class="col-6 col-sm-3">
+                        <h5>
+                            <i class="fa-solid fa-location-dot" style="margin-right: 10px;"></i>
+                            <a href="#{{i[0]}}">{{i[0]}}</a>
+                        </h5>
+                    </div>
+                {%endfor%}
+            </div>
+        </div>
+        <br>
+        <hr>
+        <center><h3>Select Cities</h3></center>
+        <hr>
+        <div class="container" id="city-section">
+            {% for i in location_list %}
+                <div class="element" id="{{i[0]}}">
+                    <h4 id="head">
+                        <i class="fa-solid fa-location-dot" style="margin-right: 10px;"></i>
+                        <a href="{{url_for('country_specific',location=i[0])}}">{{i[0]}}</a>
+                    </h4>
+                    <div class="row" style="margin-left: 5px;">
+                        {% for j in i[1][2]['cities']%}
+                            <div class="col-6 col-sm-3">
+                                <h5>
+                                    <i class="fa-solid fa-location-dot" style="margin-right: 10px;"></i>
+                                    <a href="{{url_for('city_specific',country=i[0],city=j[0])}}">{{j[0]}}</a>
+                                </h5>
+                            </div>
+                        {%endfor%}
+                    </div>
+                    <br>
+                </div>
+            {%endfor%}
+        </div>
+          
+    </section>
+
+    
+</body>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://kit.fontawesome.com/411329c929.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.min.js" integrity="sha384-ODmDIVzN+pFdexxHEHFBQH3/9/vQ9uori45z4JjnFsRydbmQbmL5t1tQ0culUzyK" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script type="text/javascript" src="https://unpkg.com/xlsx@0.15.1/dist/xlsx.full.min.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.js"></script>
+<script type="text/javascript">
+    setTimeout(function () { 
+      location.reload();
+    }, 1800000);
+</script>
+
+</html>
+
